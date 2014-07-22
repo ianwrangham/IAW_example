@@ -1,0 +1,74 @@
+'THIS IS A TEST FILE TO DETERMINE WHETHER OR NOT CODE REFERRING TO CGR3 (+THERMISTOR)
+'IS FUNCTIONAL
+
+'Written on 07/09/2014 by Ian A. Wrangham
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+Const SCAN_INTERVAL = 250			'250 (mSec)
+
+                          
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''                          
+                                                
+'9H CGR_in signal
+'9L CGR_in ref
+
+'10H CGR_out signal
+'10L CGR_out ref
+
+
+'18H thermistor_in signal
+'18L thermistor_out signal
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'Declare Public Variables
+
+'CGR pyrgeometer
+Public CGR3(2)
+Alias CGR3(1)= CGR3_in
+Alias CGR3(2)= CGR3_out
+Units CGR3_in = mV
+Units CGR3_out = mV
+
+'Internal CGR3 thermistors
+Public thermistor(2)
+Alias thermistor(1)=thermistor_in
+Alias thermistor(2)=thermistor_out
+Units thermistor(1)=degC
+Units thermistor(2)=degC
+
+'Counter for Scan/NextScan
+Public counter
+
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'Define Data Tables
+
+'These data tables for display purposes only
+DataTable (test_CGR,TRUE,1)
+  DataInterval (0,0,mSec,10)
+  Sample (2,CGR3(1),IEEE4)
+  Sample (2,thermistor(1),IEEE4)
+EndTable  
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'Main Program
+      BeginProg
+        
+      counter=0
+
+'Scan
+      Scan (SCAN_INTERVAL,mSec,15,0)
+            counter=counter+1
+
+'Take voltage reading from CGR3
+     VoltDiff (CGR3(1),2,mV20,9,True ,450,250,1.0,0)
+ 
+'Get CGR3 internal temperatures
+     BrHalf (thermistor(1),2,mv5000,35,Vx1,1,2500,True,450,250,1,0)
+     
+     NextScan
+     
+     CallTable test_CGR
+     
+     EndProg
